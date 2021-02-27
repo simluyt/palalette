@@ -2,12 +2,31 @@
 	import { randomColor } from 'randomcolor';
 	import Color from './Color.svelte';
 
-	let colors: string[] = randomColor({'count':7});
+	interface ColorProps {
+		lock: boolean;
+		hex: string;
+		index: number;
+	}
+
+	let initColors = randomColor({'count':7});
+	let colors: ColorProps[] = []
+	initColors.forEach((color,index) => {
+		colors.push({hex: color, lock:false, index: index})
+	});
 
 	function handlePress(e) {
 		if( e.key === " ") {
-			colors =  randomColor({'count':7});
+			const newColors = randomColor({'count':7});
+			newColors.forEach((color, idx) => {
+				colors[idx].lock ? 
+					console.log('Locked') :
+					colors[idx].hex = color;
+			});
 		}
+	}
+
+	function handleMessage(event) {
+		colors[event.detail.index].lock = event.detail.locked	
 	}
 
 
@@ -18,7 +37,7 @@
 
 <main>
 	{#each colors as color}
-	<Color color={color}/>
+	<Color on:message={handleMessage} color={color.hex} lock={color.lock} index={color.index}/>
 	{/each}
 </main>
 
