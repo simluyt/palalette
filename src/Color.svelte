@@ -1,19 +1,22 @@
 <script lang="ts">
+    import Icon from 'svelte-awesome';
+    import { lock, unlock } from 'svelte-awesome/icons';
+
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
     export let color: string;
-    export let lock: boolean;
+    export let locked: boolean;
     export let index: number;
     let colorInfo;
     
     $: colorInfo = fetch("https://www.thecolorapi.com/id?hex=" + color.slice(1,7), {mode: 'cors'}).then((x) => x.json());
 
     function toggleLocked() {
-        lock = !lock
+        locked = !locked
 		dispatch('message', {
 			index: index,
-            locked: lock
+            locked: locked
 		});
 	}
 
@@ -26,7 +29,7 @@
 {:then info} 
 <p>{info.name.value}</p>
 {/await}
-<p on:click={toggleLocked}>{lock ? "locked" : "unlocked"}</p>
+<p on:click={toggleLocked}><Icon  data={locked ? lock : unlock}/></p>
 <p>hue</p>	
 </main>
 

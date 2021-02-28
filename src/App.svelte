@@ -19,7 +19,7 @@
 			const newColors = randomColor({'count':7});
 			newColors.forEach((color, idx) => {
 				colors[idx].lock ? 
-					console.log('Locked') :
+					'' :
 					colors[idx].hex = color;
 			});
 		}
@@ -37,7 +37,7 @@
 
 <main>
 	{#each colors as color}
-	<Color on:message={handleMessage} color={color.hex} lock={color.lock} index={color.index}/>
+	<Color on:message={handleMessage} color={color.hex} locked={color.lock} index={color.index}/>
 	{/each}
 </main>
 
