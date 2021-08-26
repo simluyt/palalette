@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { randomColor } from 'randomcolor';
 	import Color from './Color.svelte';
+	import { SvelteToast } from '@zerodevx/svelte-toast'
 
 	interface ColorProps {
     lock: boolean;
@@ -49,11 +50,17 @@
 
 <main>
 		{#each colors as color(color.id)}
-		<Color on:message={handleMessage} color={color.hex} locked={color.lock} index={color.index}/>
+		<Color on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index}/>
 		{/each}
+		<div className="wrap">
+			<SvelteToast options={{ reversed: true, intro: { y: 192 } }} />
+		</div>
+
 </main>
 
 <style>
+	@import url("https://fonts.googleapis.com/css?family=Raleway&display=swap");
+
 	main {
 		text-align: center;
 		height: 100vh;
@@ -69,4 +76,17 @@
 			max-width: none;
 		}
 	}
+
+	:root {
+    --toastContainerTop: auto;
+    --toastContainerRight: auto;
+    --toastContainerBottom: 8rem;
+    --toastContainerLeft: calc(50vw - 8rem);
+  }
+
+  	.wrap {
+		display: contents;
+		font-family: "Raleway", sans-serif;
+		font-size: 0.875rem;
+  }
 </style>

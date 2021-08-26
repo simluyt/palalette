@@ -4,6 +4,7 @@
     import Fa from 'svelte-fa';
     import { faCopy, faLock, faTimes, faUnlock } from '@fortawesome/free-solid-svg-icons';
     import { Circle } from 'svelte-loading-spinners';
+    import { toast } from '@zerodevx/svelte-toast'
 
     import Hoverable from './Hoverable.svelte';
     import { adjustColor } from './helpers';
@@ -11,13 +12,13 @@
 
     const dispatch = createEventDispatcher();
 
-    export let color: string;
+    export let hex: string;
     export let locked: boolean;
     export let index: number;
 
     //fetch color name
     let colorInfo;
-    $: colorInfo = fetch("https://www.thecolorapi.com/id?hex=" + color.slice(1,7), {mode: 'cors'}).then((x) => x.json());
+    $: colorInfo = fetch("https://www.thecolorapi.com/id?hex=" + hex.slice(1,7), {mode: 'cors'}).then((x) => x.json());
 
 
     //controls
@@ -33,6 +34,13 @@
 
     function toggleLocked() {
         locked = !locked
+        toast.push(`${locked ? 'Locked' : "Unlocked"} ${hex}`, {
+        theme: {
+            '--toastBackground': '#48BB78',
+            '--toastColor': adjustColor('#48BB78', 40),
+            '--toastProgressBackground': '#48BB78'
+        }
+    })
 		dispatch('message', {
 			index: index,
             type: 'toggleLock',
@@ -41,6 +49,13 @@
 	}
 
     function removeColor() {
+        toast.push('Color succesfully deleted', {
+        theme: {
+            '--toastBackground': '#48BB78',
+            '--toastColor': adjustColor('#48BB78', 40),
+            '--toastProgressBackground': '#48BB78'
+        }
+    })
 		dispatch('message', {
 			index: index,
             type: 'remove',
@@ -48,6 +63,13 @@
 	}
 
     function copyColor() {
+        toast.push('Color copied to the clipboard', {
+        theme: {
+            '--toastBackground': '#48BB78',
+            '--toastColor': adjustColor('#48BB78', 40),
+            '--toastProgressBackground': '#48BB78'
+        }
+    })
 		dispatch('message', {
 			index: index,
             type: 'copy',
@@ -56,16 +78,16 @@
 
     //dyn
     $: cssVarStyles = `
-    --bg-color:${color};
-    --name-color:${adjustColor(color, 30)};
-    --hex-color:${adjustColor(color, 90)};`;
+    --bg-color:${hex};
+    --name-color:${adjustColor(hex, 30)};
+    --hex-color:${adjustColor(hex, 90)};`;
 
 </script>
 <main class="bg" style="{cssVarStyles}" on:mouseenter={enter} on:mouseleave={leave}>
-    <h2 class="hex">{color.slice(1,7).toUpperCase()}</h2>
+    <h2 class="hex">{hex.slice(1,7).toUpperCase()}</h2>
     {#await colorInfo}
     <div class="loader">
-        <Circle size="13" color={adjustColor(color, 30)} unit="px" duration="0.5s"></Circle>
+        <Circle size="13" color={adjustColor(hex, 30)} unit="px" duration="0.5s"></Circle>
     </div>
     {:then info} 
     <p class="name">{info.name.value}</p>
@@ -75,21 +97,21 @@
         {#if hovering}
         <Hoverable let:hovering={active}>
         <div class:active on:click={removeColor}>
-            <Fa icon={faTimes} color={active ? adjustColor(color, 100) : adjustColor(color, 50) } size="2x"/> 
+            <Fa icon={faTimes} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
         </div>
         </Hoverable>
         {/if}
         {#if hovering}
         <Hoverable let:hovering={active}>
         <div class:active on:click={copyColor}>
-            <Fa icon={faCopy} color={active ? adjustColor(color, 100) : adjustColor(color, 50) } size="2x"/> 
+            <Fa icon={faCopy} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
         </div>
         </Hoverable>
         {/if}
         {#if hovering || locked}
         <Hoverable let:hovering={active}>
         <div class:active on:click={toggleLocked}>
-            <Fa icon={locked ? faLock : faUnlock} color={active || locked ? adjustColor(color, 100) : adjustColor(color, 50) } size="2x"/> 
+            <Fa icon={locked ? faLock : faUnlock} color={active || locked ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
         </div>
         </Hoverable>
         {/if}
