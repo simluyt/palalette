@@ -2,8 +2,9 @@
 	import { randomColor } from 'randomcolor';
 	import Color from './Color.svelte';
 	import { SvelteToast } from '@zerodevx/svelte-toast'
+	import { toast } from '@zerodevx/svelte-toast'
 	import { Circle } from 'svelte-loading-spinners';
-import { adjustColor } from './helpers';
+	import { adjustColor } from './helpers';
 
 	interface ColorProps {
     lock: boolean;
@@ -37,10 +38,31 @@ import { adjustColor } from './helpers';
 	function handleMessage(event) {
 		if (event.detail.type === 'toggleLocked') {
 			colors[event.detail.index].lock = event.detail.locked;
+			toast.push(`${event.detail.locked ? 'Locked' : "Unlocked"} ${event.detail.hex}`, {
+        	theme: {
+				'--toastBackground': '#48BB78',
+				'--toastColor': adjustColor('#48BB78', 40),
+				'--toastProgressBackground': '#48BB78'
+			}
+		})
 		} else  if (event.detail.type === 'remove'){
 			colors = colors.filter(item => item.index !== event.detail.index);
+			toast.push('Color succesfully deleted', {
+                theme: {
+                    '--toastBackground': '#48BB78',
+                    '--toastColor': adjustColor('#48BB78', 40),
+                    '--toastProgressBackground': '#48BB78'
+                }
+            })
 		} else {
 			navigator.clipboard.writeText(colors[event.detail.index].hex);
+				toast.push('Color copied to the clipboard', {
+			theme: {
+				'--toastBackground': '#48BB78',
+				'--toastColor': adjustColor('#48BB78', 40),
+				'--toastProgressBackground': '#48BB78'
+			}
+		})
 		}
 			
 	}

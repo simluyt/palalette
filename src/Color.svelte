@@ -34,32 +34,20 @@
 
     function toggleLocked() {
         locked = !locked
-        toast.push(`${locked ? 'Locked' : "Unlocked"} ${hex}`, {
-        theme: {
-            '--toastBackground': '#48BB78',
-            '--toastColor': adjustColor('#48BB78', 40),
-            '--toastProgressBackground': '#48BB78'
-        }
-    })
 		dispatch('message', {
 			index: index,
             type: 'toggleLock',
-            locked: locked
+            locked: locked,
+            hex: hex
 		});
 	}
 
     function removeColor() {
         if (!locked) {
-            toast.push('Color succesfully deleted', {
-                theme: {
-                    '--toastBackground': '#48BB78',
-                    '--toastColor': adjustColor('#48BB78', 40),
-                    '--toastProgressBackground': '#48BB78'
-                }
-            })
 		    dispatch('message', {
                 index: index,
                 type: 'remove',
+                locked: locked
             });
         } else {
             toast.push('Cannot delete locked color', {
@@ -99,13 +87,6 @@
     }
 
     function copyColor() {
-        toast.push('Color copied to the clipboard', {
-        theme: {
-            '--toastBackground': '#48BB78',
-            '--toastColor': adjustColor('#48BB78', 40),
-            '--toastProgressBackground': '#48BB78'
-        }
-    })
 		dispatch('message', {
 			index: index,
             type: 'copy',
