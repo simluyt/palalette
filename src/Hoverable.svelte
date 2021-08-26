@@ -1,5 +1,6 @@
 <script>
 	let hovering;
+	export let className = "";
 
 	function enter() {
 		hovering = true;
@@ -10,6 +11,6 @@
 	}
 </script>
 
-<div on:mouseenter={enter} on:mouseleave={leave}>
+<div class={className} on:mouseenter={enter} on:mouseleave={leave}>
 	<slot hovering={hovering}></slot>
 </div>

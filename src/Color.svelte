@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte';
 
     import Fa from 'svelte-fa';
-    import { faCopy, faLock, faTimes, faUnlock } from '@fortawesome/free-solid-svg-icons';
+    import { faCopy, faLock, faPlusCircle, faTimes, faUnlock } from '@fortawesome/free-solid-svg-icons';
     import { Circle } from 'svelte-loading-spinners';
     import { toast } from '@zerodevx/svelte-toast'
 
@@ -49,18 +49,54 @@
 	}
 
     function removeColor() {
-        toast.push('Color succesfully deleted', {
-        theme: {
-            '--toastBackground': '#48BB78',
-            '--toastColor': adjustColor('#48BB78', 40),
-            '--toastProgressBackground': '#48BB78'
-        }
-    })
-		dispatch('message', {
-			index: index,
-            type: 'remove',
-		});
-	}
+        if (!locked) {
+            toast.push('Color succesfully deleted', {
+                theme: {
+                    '--toastBackground': '#48BB78',
+                    '--toastColor': adjustColor('#48BB78', 40),
+                    '--toastProgressBackground': '#48BB78'
+                }
+            })
+		    dispatch('message', {
+                index: index,
+                type: 'remove',
+            });
+        } else {
+            toast.push('Cannot delete locked color', {
+                theme: {
+                    '--toastBackground': '#e63239',
+                    '--toastColor': adjustColor('#e63239', 40),
+                    '--toastProgressBackground': '#e63239'
+                }
+            });
+
+	    }
+    }
+
+    function addColor() {
+        if (!locked) {
+            toast.push('Color succesfully deleted', {
+                theme: {
+                    '--toastBackground': '#48BB78',
+                    '--toastColor': adjustColor('#48BB78', 40),
+                    '--toastProgressBackground': '#48BB78'
+                }
+            })
+		    dispatch('message', {
+                index: index,
+                type: 'remove',
+            });
+        } else {
+            toast.push('Cannot delete locked color', {
+                theme: {
+                    '--toastBackground': '#e63239',
+                    '--toastColor': adjustColor('#e63239', 40),
+                    '--toastProgressBackground': '#e63239'
+                }
+            });
+
+	    }
+    }
 
     function copyColor() {
         toast.push('Color copied to the clipboard', {
@@ -83,7 +119,10 @@
     --hex-color:${adjustColor(hex, 90)};`;
 
 </script>
+
 <main class="bg" style="{cssVarStyles}" on:mouseenter={enter} on:mouseleave={leave}>
+    <aside class="colorSide" />
+    <div class="colorMain">
     <h2 class="hex">{hex.slice(1,7).toUpperCase()}</h2>
     {#await colorInfo}
     <div class="loader">
@@ -116,8 +155,15 @@
         </Hoverable>
         {/if}
     </div>
+    </div>
+    <Hoverable className=colorSide let:hovering={show}>
+        <div class="plusContainer" on:click={addColor}>
+            <div class="plusButton">
+                <Fa icon={faPlusCircle} color={show ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
+            </div>
+        </div>
+    </Hoverable>
 </main>
-
 
 <style type="scss">
     @import url("https://fonts.googleapis.com/css?family=Raleway&display=swap");
@@ -126,6 +172,7 @@
 		text-align: center;
 		width: 100%;
         height: 100%;
+        display: flex;
 	}
 
     .hex {
@@ -159,5 +206,28 @@
         * {
             padding: 10px  0px;
         }
+    }
+    .colorMain {
+        width: 80%;
+    }
+
+    .colorSide {
+        height: 100%;
+        width: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+    }
+
+    .plusContainer {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .plusButton {
+        position: relative;
+        margin-left: 68%;
     }
 </style>
