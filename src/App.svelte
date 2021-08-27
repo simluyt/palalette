@@ -10,7 +10,6 @@
     lock: boolean;
     hex: string;
     index: number;
-	totalColors: number;
 	}
 
 	let colors: ColorProps[] = [];
@@ -19,16 +18,15 @@
 	let initColors = randomColor({'count': colorCount});
 	
 	initColors.forEach((color,index) => {
-		colors.push({hex: color, lock:false, index: index, totalColors: colorCount});
+		colors.push({hex: color, lock:false, index: index});
 	});
 
 
 
 	function handlePress(e) {
 		if(e.key === " ") {
-			const newColors = randomColor({'count':colorCount});
+			const newColors = randomColor({'count': colorCount});
 			newColors.forEach((color, idx) => {
-				colors[idx].totalColors = colorCount;
 				if (colors[idx].lock ) {
 					colors[idx].hex = color;
 				}
@@ -47,8 +45,25 @@
 			}
 		})
 		} else  if (event.detail.type === 'remove'){
+			colorCount--;
 			colors = colors.filter(item => item.index !== event.detail.index);
 			toast.push('Color succesfully deleted', {
+                theme: {
+                    '--toastBackground': '#48BB78',
+                    '--toastColor': adjustColor('#48BB78', 40),
+                    '--toastProgressBackground': '#48BB78'
+                }
+            })
+		} else  if (event.detail.type === 'add'){
+			colorCount++;
+			colors.splice(event.detail.index, 0, {hex: '#ffffff', lock: false, index: event.detail.index});
+			let count = 0
+			colors.forEach(item => {
+				item.index = count;
+				console.log(item)
+				count++;
+			})
+			toast.push('Color succesfully added', {
                 theme: {
                     '--toastBackground': '#48BB78',
                     '--toastColor': adjustColor('#48BB78', 40),
@@ -76,9 +91,9 @@
 
 <main>
 		{#each colors as color(color.index)}
-		<Color on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index} totalColors={colorCount}/>
+		<Color on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index} bind:colorCount="{colorCount}" />
 		{/each}
-		<div className="wrap">
+		<div class="wrap">
 			<SvelteToast options={{ reversed: true, intro: { y: 120 } }} />
 		</div>
 </main>
@@ -111,7 +126,6 @@
 
   	.wrap {
 		display: contents;
-		font-family: "Raleway", sans-serif;
-		font-size: 0.875rem;
+		font-family: "Raleway", Arial, Helvetica, sans-serif;
   }
 </style>

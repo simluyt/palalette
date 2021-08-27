@@ -15,7 +15,7 @@
     export let hex: string;
     export let locked: boolean;
     export let index: number;
-    export let totalColors: number;
+    export let colorCount: number;
 
     //fetch color name
     let colorInfo;
@@ -64,19 +64,12 @@
 
     function addColor() {
         if (!locked) {
-            toast.push('Color succesfully deleted', {
-                theme: {
-                    '--toastBackground': '#48BB78',
-                    '--toastColor': adjustColor('#48BB78', 40),
-                    '--toastProgressBackground': '#48BB78'
-                }
-            })
 		    dispatch('message', {
                 index: index,
-                type: 'remove',
+                type: 'add',
             });
         } else {
-            toast.push('Cannot delete locked color', {
+            toast.push('Cannot add another color', {
                 theme: {
                     '--toastBackground': '#e63239',
                     '--toastColor': adjustColor('#e63239', 40),
@@ -108,7 +101,7 @@
    
     
     <div class="controls">
-        {#if hovering && totalColors > 2}
+        {#if hovering && colorCount > 2}
         <Hoverable let:hovering={active}>
         <div class:active on:click={removeColor}>
             <Fa icon={faTimes} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
@@ -143,11 +136,9 @@
 
     </div>
     <Hoverable className=colorSide let:hovering={show}>
-        {#if !show}
         <div class="plusContainer" on:click={addColor}>
             <Fa icon={faPlusCircle} color={show ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/>
         </div>
-        {/if}
     </Hoverable>
 </main>
 
