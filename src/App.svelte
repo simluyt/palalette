@@ -10,33 +10,34 @@
     lock: boolean;
     hex: string;
     index: number;
-    id: number;
+	totalColors: number;
 	}
 
 	let colors: ColorProps[] = [];
 	let colorCount = 5;
 
-	let initColors = randomColor({'count':colorCount});
+	let initColors = randomColor({'count': colorCount});
 	
 	initColors.forEach((color,index) => {
-		colors.push({hex: color, lock:false, index: index, id: index})
+		colors.push({hex: color, lock:false, index: index, totalColors: colorCount});
 	});
 
 
 
 	function handlePress(e) {
-		if( e.key === " ") {
+		if(e.key === " ") {
 			const newColors = randomColor({'count':colorCount});
 			newColors.forEach((color, idx) => {
-				colors[idx].lock ? 
-					'' :
+				colors[idx].totalColors = colorCount;
+				if (colors[idx].lock ) {
 					colors[idx].hex = color;
+				}
 			});
 		}
 	}
 
 	function handleMessage(event) {
-		if (event.detail.type === 'toggleLocked') {
+		if (event.detail.type === 'toggleLock') {
 			colors[event.detail.index].lock = event.detail.locked;
 			toast.push(`${event.detail.locked ? 'Locked' : "Unlocked"} ${event.detail.hex}`, {
         	theme: {
@@ -74,19 +75,12 @@
 <svelte:window on:keypress={e => handlePress(e)} />
 
 <main>
-		{#await initColors} 
-		<div class="loader">
-			<Circle size="13" color={adjustColor("#fffff", 30)} unit="px" duration="0.5s"></Circle>
-		</div>
-		{:then colorScheme} 
-		{#each colors as color(color.id)}
-		<Color on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index}/>
+		{#each colors as color(color.index)}
+		<Color on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index} totalColors={colorCount}/>
 		{/each}
 		<div className="wrap">
 			<SvelteToast options={{ reversed: true, intro: { y: 120 } }} />
 		</div>
-		{/await}
-
 </main>
 
 <style>

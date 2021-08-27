@@ -15,6 +15,7 @@
     export let hex: string;
     export let locked: boolean;
     export let index: number;
+    export let totalColors: number;
 
     //fetch color name
     let colorInfo;
@@ -104,17 +105,10 @@
 <main class="bg" style="{cssVarStyles}" on:mouseenter={enter} on:mouseleave={leave}>
     <aside class="colorSide" />
     <div class="colorMain">
-    <h2 class="hex">{hex.slice(1,7).toUpperCase()}</h2>
-    {#await colorInfo}
-    <div class="loader">
-        <Circle size="13" color={adjustColor(hex, 30)} unit="px" duration="0.5s"></Circle>
-    </div>
-    {:then info} 
-    <p class="name">{info.name.value}</p>
-    {/await}
+   
     
     <div class="controls">
-        {#if hovering}
+        {#if hovering && totalColors > 2}
         <Hoverable let:hovering={active}>
         <div class:active on:click={removeColor}>
             <Fa icon={faTimes} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
@@ -136,13 +130,24 @@
         </Hoverable>
         {/if}
     </div>
+
+    <h2 class="hex">{hex.slice(1,7).toUpperCase()}</h2>
+    {#await colorInfo}
+    <div class="loader">
+        <Circle size="17" color={adjustColor(hex, 30)} unit="px" duration="0.5s"></Circle>
+    </div>
+    {:then info} 
+    <p class="name">{info.name.value}</p>
+    {/await}
+
+
     </div>
     <Hoverable className=colorSide let:hovering={show}>
+        {#if !show}
         <div class="plusContainer" on:click={addColor}>
-            <div class="plusButton">
-                <Fa icon={faPlusCircle} color={show ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
-            </div>
+            <Fa icon={faPlusCircle} color={show ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/>
         </div>
+        {/if}
     </Hoverable>
 </main>
 
@@ -157,13 +162,14 @@
 	}
 
     .hex {
-        font-family: 'Raleway';
+        font-family: 'Raleway', Arial, Helvetica, sans-serif;
         color: var(--hex-color, lightgray);
+        font-size: 36px;
     }
 
     .name {
-        font-family: 'Raleway';
-        font-size: small;
+        font-family: 'Raleway', Arial, Helvetica, sans-serif;
+        font-size: 18px;
         color: var(--name-color, lightgray);
     }
 
@@ -190,25 +196,15 @@
     }
     .colorMain {
         width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
     }
 
     .colorSide {
         height: 100%;
         width: 10%;
-        display: flex;
-        flex-direction: column;
-        justify-content: stretch;
+       
     }
 
-    .plusContainer {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .plusButton {
-        position: relative;
-        margin-left: 68%;
-    }
 </style>
