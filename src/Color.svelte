@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte';
 
     import Fa from 'svelte-fa';
-    import { faCopy, faLock, faPlusCircle, faTimes, faUnlock } from '@fortawesome/free-solid-svg-icons';
+    import { faCopy, faLock, faPlus, faPlusCircle, faTimes, faUnlock } from '@fortawesome/free-solid-svg-icons';
     import { Circle } from 'svelte-loading-spinners';
     import { toast } from '@zerodevx/svelte-toast'
 
@@ -18,8 +18,8 @@
     export let colorCount: number;
 
     //fetch color name
-    let colorInfo;
-    $: colorInfo = fetch("https://www.thecolorapi.com/id?hex=" + hex.slice(1,7), {mode: 'cors'}).then((x) => x.json());
+    
+    $: name = fetch("https://www.thecolorapi.com/id?hex=" + hex.slice(1,7), {mode: 'cors'}).then((x) => x.json());
 
 
     //controls
@@ -63,7 +63,7 @@
     }
 
     function addColor() {
-        if (!locked) {
+        if (colorCount < 10) {
 		    dispatch('message', {
                 index: index,
                 type: 'add',
@@ -96,50 +96,48 @@
 </script>
 
 <main class="bg" style="{cssVarStyles}" on:mouseenter={enter} on:mouseleave={leave}>
-    <aside class="colorSide" />
     <div class="colorMain">
-   
-    
+    <div class="colorNames">
+        <h2 class="hex">{hex.slice(1,7).toUpperCase()}</h2>
+        <div class="loader">
+        {#await name}
+         <p><Circle size="15" color={adjustColor(hex, 30)} unit="px" duration="1s"></Circle></p>   
+        {:then info} 
+        <p class="name">{info.name.value}</p>
+        {/await}
+        </div>
+    </div>
     <div class="controls">
         {#if hovering && colorCount > 2}
-        <Hoverable let:hovering={active}>
-        <div class:active on:click={removeColor}>
-            <Fa icon={faTimes} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
+            <Hoverable let:hovering={active}>
+                <div class:active on:click={removeColor}>
+                    <Fa icon={faTimes} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
+                </div>
+            </Hoverable>
+        {/if}
+        {#if hovering && colorCount < 10}
+        <div class="plusContainer" on:click={addColor}>
+            <Hoverable let:hovering={active}>
+            <Fa icon={faPlus} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/>
+            </Hoverable>
         </div>
-        </Hoverable>
         {/if}
         {#if hovering}
-        <Hoverable let:hovering={active}>
-        <div class:active on:click={copyColor}>
-            <Fa icon={faCopy} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
-        </div>
-        </Hoverable>
+            <Hoverable let:hovering={active}>
+                <div class:active on:click={copyColor}>
+                    <Fa icon={faCopy} color={active ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
+                </div>
+            </Hoverable>
         {/if}
         {#if hovering || locked}
-        <Hoverable let:hovering={active}>
-        <div class:active on:click={toggleLocked}>
-            <Fa icon={locked ? faLock : faUnlock} color={active || locked ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
-        </div>
-        </Hoverable>
+            <Hoverable let:hovering={active}>
+                <div class:active on:click={toggleLocked}>
+                    <Fa icon={locked ? faLock : faUnlock} color={active || locked ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/> 
+                </div>
+            </Hoverable>
         {/if}
     </div>
-
-    <h2 class="hex">{hex.slice(1,7).toUpperCase()}</h2>
-    {#await colorInfo}
-    <div class="loader">
-        <Circle size="17" color={adjustColor(hex, 30)} unit="px" duration="0.5s"></Circle>
     </div>
-    {:then info} 
-    <p class="name">{info.name.value}</p>
-    {/await}
-
-
-    </div>
-    <Hoverable className=colorSide let:hovering={show}>
-        <div class="plusContainer" on:click={addColor}>
-            <Fa icon={faPlusCircle} color={show ? adjustColor(hex, 100) : adjustColor(hex, 50) } size="2x"/>
-        </div>
-    </Hoverable>
 </main>
 
 <style type="scss">
@@ -160,7 +158,7 @@
 
     .name {
         font-family: 'Raleway', Arial, Helvetica, sans-serif;
-        font-size: 18px;
+        font-size: 16px;
         color: var(--name-color, lightgray);
     }
 
@@ -174,28 +172,28 @@
         justify-content: center;
     }
 
+    .colorNames {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
     .controls {
         margin: 25px auto;
         max-width: 30px;
         display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
+        justify-content: flex-end;
 
         * {
             padding: 10px  0px;
         }
     }
     .colorMain {
-        width: 80%;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
-    }
-
-    .colorSide {
-        height: 100%;
-        width: 10%;
-       
+        
     }
 
 </style>

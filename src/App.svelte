@@ -3,8 +3,11 @@
 	import Color from './Color.svelte';
 	import { SvelteToast } from '@zerodevx/svelte-toast'
 	import { toast } from '@zerodevx/svelte-toast'
-	import { Circle } from 'svelte-loading-spinners';
 	import { adjustColor } from './helpers';
+	import { fade, scale } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
+	import { elasticInOut } from "svelte/easing";
+	import { insert } from 'ramda';
 
 	interface ColorProps {
     lock: boolean;
@@ -24,10 +27,10 @@
 
 
 	function handlePress(e) {
-		if(e.key === " ") {
+		if( e.key === " ") {
 			const newColors = randomColor({'count': colorCount});
 			newColors.forEach((color, idx) => {
-				if (colors[idx].lock ) {
+				if (!colors[idx].lock ) {
 					colors[idx].hex = color;
 				}
 			});
@@ -56,13 +59,36 @@
             })
 		} else  if (event.detail.type === 'add'){
 			colorCount++;
-			colors.splice(event.detail.index, 0, {hex: '#ffffff', lock: false, index: event.detail.index});
-			let count = 0
-			colors.forEach(item => {
-				item.index = count;
-				console.log(item)
+			colors = insert(event.detail.index + 1, {hex: randomColor(), lock: false, index: event.detail.index}, colors);
+			let count = 0;
+			colors.forEach((color: any) => {
+				color.index = count;
 				count++;
-			})
+			});
+
+			// let prevColor = null;
+			// let newColors = colors.map(item => {
+			// 	if (count === event.detail.index + 1) {
+			// 		prevColor = item
+			// 		count++;
+			// 		return {hex: randomColor(), lock: false, index: event.detail.index + 1}
+			// 	} else if (prevColor) {
+			// 		let temp = prevColor;
+			// 		temp.index = count;
+			// 		prevColor = item;
+			// 		count++;
+			// 		return temp;
+			// 	}
+			// 	else {
+			// 		item.index = count;
+			// 		count++;
+			// 		return item
+			// 	};
+				
+			// });
+			// prevColor.index = count;
+			// newColors.push(prevColor);
+			// colors = newColors;
 			toast.push('Color succesfully added', {
                 theme: {
                     '--toastBackground': '#48BB78',
@@ -84,6 +110,18 @@
 	}
 
 
+//   const customTransition = (node, { duration }) => {
+//     return {
+//       css: (t: any) => {
+//         return `
+//         transform: scaleX(${t});
+//         `;
+//       },
+//       duration: duration,
+//     };
+//   };
+
+//transition:customTransition="{{duration: 200}}
 
 </script>
 
@@ -91,7 +129,10 @@
 
 <main>
 		{#each colors as color(color.index)}
-		<Color on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index} bind:colorCount="{colorCount}" />
+		<div class="color">
+			<Color  on:message={handleMessage} hex={color.hex} locked={color.lock} index={color.index} bind:colorCount="{colorCount}" />
+		</div>
+		
 		{/each}
 		<div class="wrap">
 			<SvelteToast options={{ reversed: true, intro: { y: 120 } }} />
@@ -122,6 +163,10 @@
     --toastContainerRight: auto;
     --toastContainerBottom: 8rem;
     --toastContainerLeft: calc(50vw - 8rem);
+  }
+
+  .color {
+	width: 100%;
   }
 
   	.wrap {
